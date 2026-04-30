@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
+    "module": "es2015",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ES2022"
+    ],
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -15,5 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "rootDir": "src"
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

@@ -6,14 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/server.js",
+    "start": "node --env-file=.env.dev dist/server.js",
     "check-types": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@data-agent/shared": "workspace:*",
     "@hono/node-server": "^2.0.0",
     "@hono/zod-validator": "^0.7.6",
-    "hono": "^4.12.15"
+    "@langchain/openai": "^1.4.5",
+    "hono": "^4.12.15",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.25.3",
