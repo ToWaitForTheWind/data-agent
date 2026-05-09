@@ -15,6 +15,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/chat2/index.vue'),
     name: 'Chat2',
   },
+  {
+    path: '/custom-res',
+    component: () => import('../views/CustomRes/index.vue'),
+    name: 'CustomRes',
+  },
 ]
 
 export const router = createRouter({

@@ -27,8 +27,22 @@
           :list-props="listProps"
           :sender-props="senderProps"
         >
-          <template #input-prefix>
-            <div>11111</div>
+          <!-- 自定义消息体渲染插槽 -->
+          <template v-for="msg in messages" :key="msg.id">
+            <template v-for="(item, index) in msg.content" :key="`${msg.id}-${item.data.id}`">
+              <div
+                v-if="item.type === 'chart'"
+                :slot="`${msg.id}-${item.type}-${index}`"
+                style="width: 600px; height: 400px"
+              >
+                <TvisionTcharts
+                  class="chart"
+                  :chart-type="item.data.chartType"
+                  :options="item.data.options"
+                  :theme="item.data.theme"
+                />
+              </div>
+            </template>
           </template>
         </t-chatbot>
       </div>
@@ -43,7 +57,10 @@ import type {
   ChatRequestParams,
   ChatServiceConfig,
   TdChatSenderActionName,
+  SSEChunkData,
+  AIContentChunkUpdate,
 } from '@tdesign-vue-next/chat'
+import { nanoId } from '@/utils/nanoId'
 
 const listProps = {
   autoScroll: true,
@@ -96,7 +113,38 @@ const handleFileRemove = (item: any) => {
 const messages = ref<any[]>([])
 const chatServiceConfig: ChatServiceConfig = {
   endpoint: '/api/chat',
-  stream: false,
+  // stream: false,
+  // 流式消息输出时的回调
+  onMessage: (chunk: SSEChunkData): AIContentChunkUpdate => {
+    const { type, ...rest } = chunk.data as any;
+    switch (type) {
+      // 正文
+      case 'text':
+        return {
+          type: 'markdown',
+          data: rest?.msg || '',
+          // 根据后端返回的paragraph字段来决定是否需要另起一段展示markdown
+          strategy: rest?.paragraph === 'next' ? 'append' : 'merge',
+        };
+      // 3、自定义渲染图表所需的数据结构
+      case 'chart':
+        return {
+          type: 'chart',
+          data: {
+            id: nanoId(),
+            ...chunk.data.content,
+          },
+          // 图表每次出现都是追加创建新的内容块
+          strategy: 'append',
+        };
+      default:
+        return {
+          type: 'markdown',
+          data: rest?.msg || '',
+          strategy: 'merge',
+        };
+    }
+  },
   onRequest: (params: ChatRequestParams) => {
     messages.value.push({
       role: 'user',
